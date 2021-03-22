@@ -1,117 +1,108 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * Generated with the TypeScript template
- * https://github.com/react-native-community/react-native-template-typescript
- *
- * @format
- */
 import 'react-native-gesture-handler'; // See: https://reactnavigation.org/docs/getting-started#installing-dependencies-into-a-bare-react-native-project
-import React from 'react';
+import React, {useState} from 'react';
+import {SafeAreaView, View, StyleSheet} from 'react-native';
+import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth';
 import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
+  Provider as PaperProvider,
+  Button,
+  TextInput,
   Text,
-  useColorScheme,
-  View,
-} from 'react-native';
-import {NavigationContainer} from '@react-navigation/native';
+} from 'react-native-paper';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+const App = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-const Section: React.FC<{
-  title: string;
-}> = ({children, title}) => {
-  const isDarkMode = useColorScheme() === 'dark';
+  const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null);
+
   return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
+    <PaperProvider>
+      {isLoggedIn ? (
+        <SafeAreaView
+          style={{flex: 1, flexDirection: 'column', justifyContent: 'center'}}>
+          <Text>Logged in as User:</Text>
+          <Text>{user?.displayName?.toString()}</Text>
+          <Text>{user?.phoneNumber?.toString()}</Text>
+          <Button mode="contained" onPress={async () => await auth().signOut()}>
+            Request SMS OTP
+          </Button>
+        </SafeAreaView>
+      ) : (
+        <PhoneSignIn handleLogin={setIsLoggedIn} handleUser={setUser} />
+      )}
+    </PaperProvider>
   );
 };
 
-const App = () => {
-  const isDarkMode = useColorScheme() === 'dark';
+type PhoneSignInProps = {
+  handleLogin: (isLoggedIn: boolean) => void;
+  handleUser: (user: FirebaseAuthTypes.User) => void;
+};
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+const PhoneSignIn = ({handleLogin, handleUser}: PhoneSignInProps) => {
+  const [phoneNumber, setPhoneNumber] = useState('+65 ');
+
+  // If null, no SMS has been sent
+  const [
+    confirm,
+    setConfirm,
+  ] = useState<FirebaseAuthTypes.ConfirmationResult | null>(null);
+
+  const [code, setCode] = useState('');
+
+  // Handle the button press
+  const signInWithPhoneNumber = async (phoneNumber: string) => {
+    const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
+    setConfirm(confirmation);
+  };
+
+  const confirmCode = async () => {
+    try {
+      const userCredential = await confirm?.confirm(code);
+      const user = userCredential?.user;
+      if (user) {
+        handleLogin(true);
+        handleUser(user);
+      }
+    } catch (error) {
+      console.log('Invalid code.');
+    }
   };
 
   return (
-    <NavigationContainer>
-      <SafeAreaView style={backgroundStyle}>
-        <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          style={backgroundStyle}>
-          <Header />
-          <View
-            style={{
-              backgroundColor: isDarkMode ? Colors.black : Colors.white,
-            }}>
-            <Section title="Step One">
-              Edit <Text style={styles.highlight}>App.js</Text> to change this
-              screen and then come back to see your edits.
-            </Section>
-            <Section title="See Your Changes">
-              <ReloadInstructions />
-            </Section>
-            <Section title="Debug">
-              <DebugInstructions />
-            </Section>
-            <Section title="Learn More">
-              Read the docs to discover what to do next:
-            </Section>
-            <LearnMoreLinks />
-          </View>
-        </ScrollView>
-      </SafeAreaView>
-    </NavigationContainer>
+    <SafeAreaView
+      style={{flex: 1, flexDirection: 'column', justifyContent: 'center'}}>
+      {confirm ? (
+        <>
+          <TextInput
+            label="OTP Code"
+            value={code}
+            onChangeText={text => setCode(text)}
+          />
+          <Button onPress={() => confirmCode()}>Confirm Code</Button>
+        </>
+      ) : (
+        <View style={styles.loginContainer}>
+          <TextInput
+            mode="outlined"
+            label="Phone Number"
+            placeholder="Enter your Phone Number"
+            value={phoneNumber}
+            onChangeText={text => setPhoneNumber(text)}
+          />
+          <Button
+            mode="contained"
+            onPress={() => signInWithPhoneNumber(phoneNumber)}>
+            Request SMS OTP
+          </Button>
+        </View>
+      )}
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
+  loginContainer: {
+    margin: 20,
   },
 });
 
