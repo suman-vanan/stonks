@@ -50,7 +50,7 @@ The benefits of TypeScript are very significant, even in a small project like th
 
 > The standard library saves programmers from having to reinvent the wheel.
 >
-> -- <cite>Bjarne Stroustrup</cite>
+> &mdash; <cite>Bjarne Stroustrup</cite>
 
 #### UI
 
