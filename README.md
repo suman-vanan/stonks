@@ -20,7 +20,7 @@ Here is a planned list of features (ticked ones are completed, unticked ones are
 
 Our requirements are to develop a mobile app that works well on both iOS & Android. The following options come to mind:
 
-- Ionic Framework
+- Ionic
 - React Native
 - Flutter
 
@@ -42,7 +42,8 @@ The benefits of TypeScript are very significant, even in a small project like th
 - Declaring types allows the static type checker to catch bugs/errors quickly
 - Makes the code base more self-documenting
 - Enhances the dev experience by enabling editors (such as VScode) to provide autocomplete with context-aware suggestions
-- Reduces the amount of menial testing needed (i.e. testing not related to business logic). No need for tests that TS can catch.
+- Reduces the amount of menial testing needed (i.e. testing not related to business logic)
+  - No need for tests that TS can catch
 - ...and so on
 
 ### What libraries to use?
