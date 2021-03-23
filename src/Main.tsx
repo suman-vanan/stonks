@@ -1,12 +1,8 @@
 import React, {useState} from 'react';
+import RootNavigator from './navigation/RootNavigator';
 import {SafeAreaView, View, StyleSheet} from 'react-native';
 import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth';
-import {
-  Provider as PaperProvider,
-  Button,
-  TextInput,
-  Text,
-} from 'react-native-paper';
+import {Provider as PaperProvider, Button, TextInput} from 'react-native-paper';
 
 const Main = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -16,15 +12,7 @@ const Main = () => {
   return (
     <PaperProvider>
       {isLoggedIn ? (
-        <SafeAreaView
-          style={{flex: 1, flexDirection: 'column', justifyContent: 'center'}}>
-          <Text>Logged in as User:</Text>
-          <Text>{user?.displayName?.toString()}</Text>
-          <Text>{user?.phoneNumber?.toString()}</Text>
-          <Button mode="contained" onPress={async () => await auth().signOut()}>
-            Request SMS OTP
-          </Button>
-        </SafeAreaView>
+        <RootNavigator />
       ) : (
         <PhoneSignIn handleLogin={setIsLoggedIn} handleUser={setUser} />
       )}
