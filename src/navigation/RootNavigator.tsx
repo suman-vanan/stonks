@@ -6,9 +6,12 @@ import {View} from 'react-native';
 import {Headline, Subheading} from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
+import SearchStackNavigator from './SearchStackNavigator';
+import PortfolioScreen from '../screens/PortfolioScreen';
+
 export type RootTabParamList = {
   Home: undefined;
-  Search: undefined;
+  SearchStack: undefined;
   Portfolio: undefined;
 };
 
@@ -18,22 +21,6 @@ const HomeScreen = () => (
   <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
     <Headline>Welcome!</Headline>
     <Subheading>This app is under construction</Subheading>
-    <Headline>👷🏽‍♂️🚧👷🏻‍♀️</Headline>
-  </View>
-);
-
-const SearchScreen = () => (
-  <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-    <Headline>Search</Headline>
-    <Subheading>This feature is under construction</Subheading>
-    <Headline>👷🏽‍♂️🚧👷🏻‍♀️</Headline>
-  </View>
-);
-
-const PortfolioScreen = () => (
-  <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-    <Headline>Portfolio</Headline>
-    <Subheading>This feature is under construction</Subheading>
     <Headline>👷🏽‍♂️🚧👷🏻‍♀️</Headline>
   </View>
 );
@@ -53,8 +40,8 @@ const RootNavigator = () => {
           }}
         />
         <Tab.Screen
-          name="Search"
-          component={SearchScreen}
+          name="SearchStack"
+          component={SearchStackNavigator}
           options={{
             tabBarLabel: 'Search',
             tabBarIcon: ({color}) => (
@@ -72,11 +59,7 @@ const RootNavigator = () => {
           options={{
             tabBarLabel: 'Portfolio',
             tabBarIcon: ({color}) => (
-              <MaterialCommunityIcons
-                name="baby-face-outline"
-                color={color}
-                size={26}
-              />
+              <MaterialCommunityIcons name="finance" color={color} size={26} />
             ),
           }}
         />
