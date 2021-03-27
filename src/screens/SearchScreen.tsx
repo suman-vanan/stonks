@@ -7,6 +7,7 @@ import {
   TouchableRipple,
   ActivityIndicator,
 } from 'react-native-paper';
+import {ScrollView} from 'react-native-gesture-handler';
 import {MaterialBottomTabNavigationProp} from '@react-navigation/material-bottom-tabs';
 import {CompositeNavigationProp, useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
@@ -25,7 +26,7 @@ const SearchScreen = () => {
 
   const [searchQuery, setSearchQuery] = useState('');
 
-  const [searchResult, setSearchResult] = useState<any | null>(null);
+  const [searchResults, setSearchResults] = useState<any[] | null>(null);
 
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
@@ -35,16 +36,16 @@ const SearchScreen = () => {
   const onSubmitSearch = async () => {
     setIsError(false);
     setIsLoading(true);
-    setSearchResult(null);
+    setSearchResults(null);
 
     try {
       const response = await axios.get(
-        `https://www.alphavantage.co/query?function=OVERVIEW&symbol=${searchQuery}&apikey=${ALPHA_VANTAGE_API_KEY}`,
+        `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${searchQuery}&apikey=${ALPHA_VANTAGE_API_KEY}`,
       );
       if (response.data['Error Message']) {
-        setSearchResult(null);
+        setSearchResults(null);
       } else {
-        setSearchResult(response.data);
+        setSearchResults(response.data['bestMatches']);
       }
     } catch (error) {
       setIsError(true);
@@ -74,18 +75,23 @@ const SearchScreen = () => {
         />
       )}
 
-      {searchResult && (
-        <List.Section>
-          <TouchableRipple
-            onPress={() => {
-              navigation.push('Details', {symbol: searchResult['Symbol']});
-            }}>
-            <List.Item
-              title={searchResult['Symbol']}
-              description={searchResult['Name']}
-            />
-          </TouchableRipple>
-        </List.Section>
+      {searchResults && (
+        <ScrollView>
+          <List.Section>
+            {searchResults.map(result => (
+              <TouchableRipple
+                onPress={() => {
+                  navigation.push('Details', {symbol: result['1. symbol']});
+                }}
+                key={result['1. symbol']}>
+                <List.Item
+                  title={result['1. symbol']}
+                  description={`${result['2. name']}, ${result['3. type']}, ${result['4. region']}`}
+                />
+              </TouchableRipple>
+            ))}
+          </List.Section>
+        </ScrollView>
       )}
     </SafeAreaView>
   );
