@@ -56,3 +56,11 @@ The benefits of TypeScript are very significant, even in a small project like th
 
 - Since we don't have a UI designer, we'd benefit from a React Native component library that provides UI components that look good out-of-the-box.
 - There's a [few choices](https://blog.logrocket.com/react-native-component-libraries-in-2020/), but I settled on [React Native Paper](https://callstack.github.io/react-native-paper/index.html)
+
+## Setup Instructions
+
+Currently, I'm supporting & testing the app on iOS only. Hence, these instructions are for running this app on the iOS Simulator on a development machine.
+
+1. This app uses [Alpha Vantage](https://www.alphavantage.co/) API for financial instrument data. Get your free API key, and fill it up in `.env` (see `.env.template` for instructions)
+2. To install dependencies, run: `yarn install`
+3. To launch app on iOS Simulator (assuming your [React Native dev environment has been setup](https://reactnative.dev/docs/environment-setup)), run: `npx react-native run-ios`
