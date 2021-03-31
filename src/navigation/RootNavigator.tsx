@@ -3,7 +3,7 @@ import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
 import {View} from 'react-native';
-import {Headline, Subheading} from 'react-native-paper';
+import {Headline, Subheading, DefaultTheme} from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import SearchStackNavigator from './SearchStackNavigator';
@@ -27,7 +27,7 @@ const HomeScreen = () => (
 
 const RootNavigator = () => {
   return (
-    <NavigationContainer>
+    <NavigationContainer theme={DefaultTheme}>
       <Tab.Navigator initialRouteName="Home">
         <Tab.Screen
           name="Home"

@@ -57,7 +57,7 @@ const SearchScreen = () => {
   return (
     <SafeAreaView style={{flex: 1}}>
       <Searchbar
-        placeholder="Search by ticker"
+        placeholder="Search for financial instruments"
         onChangeText={onChangeSearch}
         value={searchQuery}
         onIconPress={onSubmitSearch}
