@@ -59,8 +59,19 @@ The benefits of TypeScript are very significant, even in a small project like th
 
 ## Setup Instructions
 
+### Build & Run
+
 Currently, I'm supporting & testing the app on iOS only. Hence, these instructions are for running this app on the iOS Simulator on a development machine.
 
 1. This app uses [Alpha Vantage](https://www.alphavantage.co/) API for financial instrument data. Get your free API key, and fill it up in `.env` (see `.env.template` for instructions)
 2. To install dependencies, run: `yarn install`
 3. To launch app on iOS Simulator (assuming your [React Native dev environment has been setup](https://reactnative.dev/docs/environment-setup)), run: `npx react-native run-ios`
+
+### Test
+
+Here's some steps to setup testing in a blank RN project created with React Native CLI.
+
+- `transformIgnorePatterns`: Used to specify which files shall be transformed by Babel. Many react-native npm modules unfortunately don't pre-compile their source code before publishing. [(Source)](https://jestjs.io/docs/tutorial-react-native#transformignorepatterns-customization)
+  - A [sample regex](https://stackoverflow.com/a/59964555/8561397) that works for some common RN scenarios
+- Mocking native dependencies
+  - Libraries such as `@react-navigation` and `@react-native-firebase` ahve dependencies that include native code, and hence need to be mocked in order to be tested. Read the docs for such libraries to understand how to mock them properly.
