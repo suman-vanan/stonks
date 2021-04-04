@@ -1,12 +1,11 @@
 import 'react-native';
 import React from 'react';
+import {render, fireEvent, act} from '@testing-library/react-native';
 import SearchScreen from '../src/screens/SearchScreen';
 import {useNavigation} from '@react-navigation/native';
-import {render, fireEvent, waitFor} from '@testing-library/react-native';
-import {act} from 'react-test-renderer';
 import axios from 'axios';
 import {ALPHA_VANTAGE_API_KEY} from '@env';
-import {expect, it} from '@jest/globals';
+import {expect, it, beforeEach} from '@jest/globals';
 
 jest.mock('axios');
 
