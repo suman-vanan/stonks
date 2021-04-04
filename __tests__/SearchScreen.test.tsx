@@ -30,7 +30,8 @@ it('renders default elements', () => {
 
 it('allows user to search for financial instruments', async () => {
   const data = JSON.parse(`{
-    "bestMatches": [
+    "data" : {
+      "bestMatches": [
         {
             "1. symbol": "StonkA",
             "2. name": "International Business Machines Corp",
@@ -53,12 +54,15 @@ it('allows user to search for financial instruments', async () => {
             "8. currency": "USD",
             "9. matchScore": "0.8571"
         }
-    ]
-}`);
+      ]
+    }
+  }`);
 
   axios.get.mockImplementationOnce(() => Promise.resolve(data));
 
-  const {getByPlaceholderText, getAllByA11yRole} = render(<SearchScreen />);
+  const {getByPlaceholderText, getAllByA11yRole, findByText, debug} = render(
+    <SearchScreen />,
+  );
 
   const CHANGE_TEXT = 'stonk';
 
@@ -68,14 +72,11 @@ it('allows user to search for financial instruments', async () => {
   );
   fireEvent.press(getAllByA11yRole('button')[0]);
 
-  // flushMicrotasksQueue (Source: https://youtu.be/VuNPrFH9H0E)
-  await act(() => new Promise(resolve => setImmediate(resolve)));
-
   expect(axios.get).toHaveBeenCalledTimes(1);
   expect(axios.get).toHaveBeenCalledWith(
     `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${CHANGE_TEXT}&apikey=${ALPHA_VANTAGE_API_KEY}`,
   );
 
-  // todo: assert that calling mock api renders the relevant list in the UI
-  // involves the rendered JSX re-rendering after hook updates state
+  await expect(findByText('StonkA')).resolves.toBeTruthy();
+  await expect(findByText('StonkB')).resolves.toBeTruthy();
 });
