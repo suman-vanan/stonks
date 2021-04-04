@@ -50,7 +50,7 @@
     "@types/react": "^17"
   },
   "jest": {
-    "preset": "react-native",
+    "preset": "./jest-preset.js",
     "moduleFileExtensions": [
       "ts",
       "tsx",
