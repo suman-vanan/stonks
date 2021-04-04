@@ -65,7 +65,7 @@ Currently, I'm supporting & testing the app on iOS only. Hence, these instructio
 
 1. This app uses [Alpha Vantage](https://www.alphavantage.co/) API for financial instrument data. Get your free API key, and fill it up in `.env` (see `.env.template` for instructions)
 2. To install dependencies, run: `yarn install`
-3. To launch app on iOS Simulator (assuming your [React Native dev environment has been setup](https://reactnative.dev/docs/environment-setup)), run: `npx react-native run-ios`
+3. To launch app on iOS Simulator (assuming your [React Native dev environment has been setup](https://reactnative.dev/docs/environment-setup)), run: `npx pod-install ios && npx react-native run-ios`
 
 ### Test
 
