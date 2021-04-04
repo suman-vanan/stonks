@@ -6,6 +6,7 @@ import {
   List,
   TouchableRipple,
   ActivityIndicator,
+  Caption,
 } from 'react-native-paper';
 import {ScrollView} from 'react-native-gesture-handler';
 import {MaterialBottomTabNavigationProp} from '@react-navigation/material-bottom-tabs';
@@ -86,7 +87,8 @@ const SearchScreen = () => {
                 key={result['1. symbol']}>
                 <List.Item
                   title={result['1. symbol']}
-                  description={`${result['2. name']}, ${result['3. type']}, ${result['4. region']}`}
+                  description={`${result['2. name']}, ${result['4. region']}`}
+                  right={() => <Caption>{`\n${result['3. type']}`}</Caption>}
                 />
               </TouchableRipple>
             ))}
