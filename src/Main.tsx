@@ -1,6 +1,11 @@
 import React, {useState} from 'react';
 import RootNavigator from './navigation/RootNavigator';
-import {SafeAreaView, View, StyleSheet} from 'react-native';
+import {
+  SafeAreaView,
+  View,
+  StyleSheet,
+  TextInput as RNTextInput,
+} from 'react-native';
 import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth';
 import {Provider as PaperProvider, Button, TextInput} from 'react-native-paper';
 
@@ -57,6 +62,7 @@ const PhoneSignIn = ({handleLogin}: PhoneSignInProps) => {
             label="OTP Code"
             value={code}
             onChangeText={text => setCode(text)}
+            render={props => <RNTextInput {...props} keyboardType="numeric" />}
           />
           <Button onPress={() => confirmCode()}>Confirm Code</Button>
         </>
@@ -68,6 +74,7 @@ const PhoneSignIn = ({handleLogin}: PhoneSignInProps) => {
             placeholder="Enter your Phone Number"
             value={phoneNumber}
             onChangeText={text => setPhoneNumber(text)}
+            render={props => <RNTextInput {...props} keyboardType="numeric" />}
           />
           <Button
             mode="contained"
