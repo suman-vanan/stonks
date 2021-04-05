@@ -1,7 +1,7 @@
 import 'react-native';
 import React from 'react';
-import {render, fireEvent, act} from '@testing-library/react-native';
-import SearchScreen from '../src/screens/SearchScreen';
+import {render, fireEvent} from '@testing-library/react-native';
+import SearchScreen from '../SearchScreen';
 import {useNavigation} from '@react-navigation/native';
 import axios from 'axios';
 import {ALPHA_VANTAGE_API_KEY} from '@env';
