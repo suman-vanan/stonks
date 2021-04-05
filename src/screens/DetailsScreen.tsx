@@ -2,8 +2,14 @@ import React, {useState, useEffect} from 'react';
 
 import {StackScreenProps} from '@react-navigation/stack';
 import {SearchStackParamList} from '../navigation/SearchStackNavigator';
-import {SafeAreaView} from 'react-native';
-import {Headline, Subheading, ActivityIndicator} from 'react-native-paper';
+import {SafeAreaView, StyleSheet} from 'react-native';
+import {
+  Headline,
+  Subheading,
+  Caption,
+  ActivityIndicator,
+  DataTable,
+} from 'react-native-paper';
 import axios from 'axios';
 import {ALPHA_VANTAGE_API_KEY} from '@env';
 import {
@@ -55,9 +61,14 @@ const DetailsScreen = ({route, navigation}: DetailsScreenProps) => {
 
         if (
           responseList[0].data['Error Message'] ||
-          responseList[1].data['Error Message']
+          responseList[0].data['Note'] ||
+          responseList[1].data['Error Message'] ||
+          responseList[1].data['Note']
         ) {
+          // @ts-expect-error
+          alert('Error Response from Alpha Vantage API');
           setTimeSeriesDailyAdjusted(null);
+          setQuote(null);
           setIsError(true);
         } else {
           setTimeSeriesDailyAdjusted(responseList[0].data);
@@ -90,29 +101,62 @@ const DetailsScreen = ({route, navigation}: DetailsScreenProps) => {
   }, []);
 
   return (
-    <SafeAreaView
-      style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+    <SafeAreaView style={styles.container}>
       {isLoading && (
         <ActivityIndicator
           animating={true}
           size="large"
           style={{
-            justifyContent: 'center',
-            alignItems: 'center',
             flex: 1,
           }}
         />
       )}
-      {timeSeriesDailyAdjusted && chartData && (
+      {isError && (
+        <Headline
+          style={{
+            flex: 1,
+          }}>
+          Oops, an error has occurred
+        </Headline>
+      )}
+      {timeSeriesDailyAdjusted && quote && chartData && (
         <>
           <Headline>{symbol}</Headline>
           <Subheading>
             {timeSeriesDailyAdjusted['Meta Data']['1. Information']}
           </Subheading>
-          <Subheading>
+          <Caption>
             Last Refreshed:{' '}
             {timeSeriesDailyAdjusted['Meta Data']['3. Last Refreshed']}
-          </Subheading>
+          </Caption>
+
+          <DataTable>
+            <DataTable.Header>
+              <DataTable.Title numeric>Open</DataTable.Title>
+              <DataTable.Title numeric>High</DataTable.Title>
+              <DataTable.Title numeric>Low</DataTable.Title>
+              <DataTable.Title numeric>Price</DataTable.Title>
+              <DataTable.Title numeric>Change (%)</DataTable.Title>
+            </DataTable.Header>
+
+            <DataTable.Row>
+              <DataTable.Cell numeric>
+                {Number(quote['Global Quote']['02. open']).toFixed(2)}
+              </DataTable.Cell>
+              <DataTable.Cell numeric>
+                {Number(quote['Global Quote']['03. high']).toFixed(2)}
+              </DataTable.Cell>
+              <DataTable.Cell numeric>
+                {Number(quote['Global Quote']['04. low']).toFixed(2)}
+              </DataTable.Cell>
+              <DataTable.Cell numeric>
+                {Number(quote['Global Quote']['05. price']).toFixed(2)}
+              </DataTable.Cell>
+              <DataTable.Cell numeric>
+                {quote['Global Quote']['10. change percent']}
+              </DataTable.Cell>
+            </DataTable.Row>
+          </DataTable>
 
           <Chart
             data={chartData}
@@ -164,5 +208,14 @@ const DetailsScreen = ({route, navigation}: DetailsScreenProps) => {
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});
 
 export default DetailsScreen;
