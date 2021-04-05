@@ -21,9 +21,10 @@ type DetailsScreenProps = StackScreenProps<SearchStackParamList, 'Details'>;
 const DetailsScreen = ({route, navigation}: DetailsScreenProps) => {
   const {symbol} = route.params;
 
-  const [financialInstrument, setFinancialInstrument] = useState<any | null>(
-    null,
-  );
+  const [timeSeriesDailyAdjusted, setTimeSeriesDailyAdjusted] = useState<
+    any | null
+  >(null);
+  const [quote, setQuote] = useState<any | null>(null);
   const [chartData, setChartData] = useState<ChartDataPoint[] | null>(null);
 
   const [isLoading, setIsLoading] = useState(false);
@@ -34,21 +35,39 @@ const DetailsScreen = ({route, navigation}: DetailsScreenProps) => {
       setIsError(false);
       setIsLoading(true);
 
-      try {
-        const response = await axios(
+      const getTimeSeriesDailyAdjusted = () => {
+        return axios.get(
           `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=${symbol}&apikey=${ALPHA_VANTAGE_API_KEY}`,
         );
-        if (response.data['Error Message']) {
-          setFinancialInstrument(null);
+      };
+
+      const getQuote = () => {
+        return axios.get(
+          `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${ALPHA_VANTAGE_API_KEY}`,
+        );
+      };
+
+      try {
+        const responseList = await Promise.all([
+          getTimeSeriesDailyAdjusted(),
+          getQuote(),
+        ]);
+
+        if (
+          responseList[0].data['Error Message'] ||
+          responseList[1].data['Error Message']
+        ) {
+          setTimeSeriesDailyAdjusted(null);
           setIsError(true);
         } else {
-          setFinancialInstrument(response.data);
+          setTimeSeriesDailyAdjusted(responseList[0].data);
+          setQuote(responseList[1].data);
 
           // todo: extract ChartDataPoint parsing logic to a utility function
           const chartData: ChartDataPoint[] = [];
           let xValue = 1;
           for (const [key, value] of Object.entries(
-            response.data['Time Series (Daily)'],
+            responseList[0].data['Time Series (Daily)'],
           ).reverse()) {
             chartData.push({
               x: xValue,
@@ -59,6 +78,8 @@ const DetailsScreen = ({route, navigation}: DetailsScreenProps) => {
           setChartData(chartData);
         }
       } catch (error) {
+        // @ts-expect-error
+        alert(error);
         setIsError(true);
       }
 
@@ -82,15 +103,15 @@ const DetailsScreen = ({route, navigation}: DetailsScreenProps) => {
           }}
         />
       )}
-      {financialInstrument && chartData && (
+      {timeSeriesDailyAdjusted && chartData && (
         <>
           <Headline>{symbol}</Headline>
           <Subheading>
-            {financialInstrument['Meta Data']['1. Information']}
+            {timeSeriesDailyAdjusted['Meta Data']['1. Information']}
           </Subheading>
           <Subheading>
             Last Refreshed:{' '}
-            {financialInstrument['Meta Data']['3. Last Refreshed']}
+            {timeSeriesDailyAdjusted['Meta Data']['3. Last Refreshed']}
           </Subheading>
 
           <Chart
