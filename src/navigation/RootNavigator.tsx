@@ -8,11 +8,13 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 
 import SearchStackNavigator from './SearchStackNavigator';
 import PortfolioScreen from '../screens/PortfolioScreen';
+import AccountScreen from '../screens/AccountScreen';
 
 export type RootTabParamList = {
   Home: undefined;
   SearchStack: undefined;
   Portfolio: undefined;
+  Account: undefined;
 };
 
 const Tab = createMaterialBottomTabNavigator<RootTabParamList>();
@@ -60,6 +62,16 @@ const RootNavigator = () => {
             tabBarLabel: 'Portfolio',
             tabBarIcon: ({color}) => (
               <MaterialCommunityIcons name="finance" color={color} size={26} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Account"
+          component={AccountScreen}
+          options={{
+            tabBarLabel: 'My Account',
+            tabBarIcon: ({color}) => (
+              <MaterialCommunityIcons name="account" color={color} size={26} />
             ),
           }}
         />
