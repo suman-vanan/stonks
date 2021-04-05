@@ -5,27 +5,20 @@ import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth';
 import {Provider as PaperProvider, Button, TextInput} from 'react-native-paper';
 
 const Main = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
   const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null);
 
   return (
     <PaperProvider>
-      {isLoggedIn ? (
-        <RootNavigator />
-      ) : (
-        <PhoneSignIn handleLogin={setIsLoggedIn} handleUser={setUser} />
-      )}
+      {user ? <RootNavigator /> : <PhoneSignIn handleLogin={setUser} />}
     </PaperProvider>
   );
 };
 
 type PhoneSignInProps = {
-  handleLogin: (isLoggedIn: boolean) => void;
-  handleUser: (user: FirebaseAuthTypes.User) => void;
+  handleLogin: (user: FirebaseAuthTypes.User) => void;
 };
 
-const PhoneSignIn = ({handleLogin, handleUser}: PhoneSignInProps) => {
+const PhoneSignIn = ({handleLogin}: PhoneSignInProps) => {
   const [phoneNumber, setPhoneNumber] = useState('+65 ');
 
   // If null, no SMS has been sent
@@ -47,11 +40,11 @@ const PhoneSignIn = ({handleLogin, handleUser}: PhoneSignInProps) => {
       const userCredential = await confirm?.confirm(code);
       const user = userCredential?.user;
       if (user) {
-        handleLogin(true);
-        handleUser(user);
+        handleLogin(user);
       }
     } catch (error) {
-      console.log('Invalid code.');
+      // @ts-expect-error
+      alert(error);
     }
   };
 
