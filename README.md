@@ -57,6 +57,13 @@ The benefits of TypeScript are very significant, even in a small project like th
 - Since we don't have a UI designer, we'd benefit from a React Native component library that provides UI components that look good out-of-the-box.
 - There's a [few choices](https://blog.logrocket.com/react-native-component-libraries-in-2020/), but I settled on [React Native Paper](https://callstack.github.io/react-native-paper/index.html)
 
+### Backend
+
+For backend functionality, I'm using Firebase as a backend-as-a-service (BaaS) platform
+
+- [Firebase Authentication](https://firebase.google.com/docs/auth) is used to authenticate users via sending an OTP to their mobile numbers
+- [Firebase Realtime Database](https://firebase.google.com/docs/database) is used to persist user data
+
 ### Testing Strategy
 
 - React Native docs have a [good overview on testing](https://reactnative.dev/docs/testing-overview)
