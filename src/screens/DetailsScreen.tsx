@@ -2,16 +2,21 @@ import React, {useState, useEffect} from 'react';
 
 import {StackScreenProps} from '@react-navigation/stack';
 import {SearchStackParamList} from '../navigation/SearchStackNavigator';
-import {SafeAreaView, StyleSheet} from 'react-native';
+import {SafeAreaView, StyleSheet, TextInput as RNTextInput} from 'react-native';
 import {
   Headline,
   Subheading,
   Caption,
   ActivityIndicator,
   DataTable,
+  Button,
+  Dialog,
+  Portal,
+  Paragraph,
+  TextInput,
 } from 'react-native-paper';
 import axios from 'axios';
-import {ALPHA_VANTAGE_API_KEY} from '@env';
+import {ALPHA_VANTAGE_API_KEY, FIREBASE_REALTIME_DATABASE_URL} from '@env';
 import {
   Chart,
   Line,
@@ -21,10 +26,12 @@ import {
   ChartDataPoint,
   Tooltip,
 } from 'react-native-responsive-linechart';
+import auth from '@react-native-firebase/auth';
+import {firebase} from '@react-native-firebase/database';
 
 type DetailsScreenProps = StackScreenProps<SearchStackParamList, 'Details'>;
 
-const DetailsScreen = ({route, navigation}: DetailsScreenProps) => {
+const DetailsScreen = ({route}: DetailsScreenProps) => {
   const {symbol} = route.params;
 
   const [timeSeriesDailyAdjusted, setTimeSeriesDailyAdjusted] = useState<
@@ -82,6 +89,7 @@ const DetailsScreen = ({route, navigation}: DetailsScreenProps) => {
           ).reverse()) {
             chartData.push({
               x: xValue,
+              // @ts-expect-error
               y: Number(value['5. adjusted close']),
             });
             xValue++;
@@ -203,9 +211,121 @@ const DetailsScreen = ({route, navigation}: DetailsScreenProps) => {
               }}
             />
           </Chart>
+          <PortfolioDialog quote={quote} />
         </>
       )}
     </SafeAreaView>
+  );
+};
+
+type PortfolioDialogProps = {
+  quote: any;
+};
+
+const PortfolioDialog = ({quote}: PortfolioDialogProps) => {
+  const [dialogVisible, setDialogVisible] = React.useState(false);
+  const showDialog = () => setDialogVisible(true);
+  const hideDialog = () => setDialogVisible(false);
+
+  const [quantity, setQuantity] = React.useState(0);
+  // todo: Should quantity be of type `number` or `bigint`? Are fractional share positions allowed?
+
+  const updateQuantity = (quantityString: string) => {
+    const quantity = Number(quantityString);
+    setQuantity(quantity);
+  };
+
+  const symbol = quote['Global Quote']['01. symbol'];
+  const price = Number(quote['Global Quote']['05. price']);
+
+  const addToPortfolio = async () => {
+    const user = auth().currentUser;
+    const userId = user?.uid;
+
+    const database = firebase.app().database(FIREBASE_REALTIME_DATABASE_URL);
+
+    try {
+      const snapshot = await database.ref(`/users/${userId}`).once('value');
+
+      if (snapshot.exists()) {
+        // add to the existing portfolio
+        const portfolio = snapshot.val();
+        if (portfolio.some((element: any) => element['symbol'] === symbol)) {
+          // add to existing open position
+          const position = portfolio.find(
+            (position: any) => position['symbol'] === symbol,
+          );
+          const oldQuantity = Number(position['quantity']);
+          const updatedQuantity = oldQuantity + quantity;
+          const oldPrice = Number(position['avgPrice']);
+
+          const newAvgPrice =
+            (oldQuantity * oldPrice + quantity * price) / updatedQuantity;
+
+          const newPosition = {
+            symbol,
+            quantity: updatedQuantity,
+            avgPrice: newAvgPrice,
+          };
+
+          const index = portfolio.findIndex(
+            (element: any) => element['symbol'] === symbol,
+          );
+          portfolio[index] = newPosition;
+          await database.ref(`/users/${userId}`).set(portfolio);
+        } else {
+          // open a new position within existing portfolio
+          portfolio.push({symbol, quantity, avgPrice: price});
+          await database.ref(`/users/${userId}`).set(portfolio);
+        }
+      } else {
+        // setup a new portfolio
+        await database
+          .ref(`/users/${userId}`)
+          .set([{symbol, quantity, avgPrice: price}]);
+      }
+    } catch (error) {
+      // @ts-expect-error
+      alert(error);
+    } finally {
+      setQuantity(0);
+      hideDialog();
+    }
+  };
+
+  // use it to check if any financial instruments added
+  // iff not add/append this one
+  //will render this stuff in portfolio view later
+
+  return (
+    <>
+      <Button onPress={showDialog} mode="outlined">
+        Add to Portfolio
+      </Button>
+      <Portal>
+        <Dialog visible={dialogVisible} onDismiss={hideDialog}>
+          <Dialog.Title>Add to Portfolio</Dialog.Title>
+          <Dialog.Content>
+            <Paragraph>
+              At the current price of {price}, how many units would you like to
+              add?
+            </Paragraph>
+            <TextInput
+              label="Quantity"
+              value={quantity.toString()}
+              onChangeText={quantity => updateQuantity(quantity)}
+              render={props => (
+                <RNTextInput {...props} keyboardType="numeric" />
+              )}
+            />
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={hideDialog}>Cancel</Button>
+            <Button onPress={addToPortfolio}>Add</Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
+    </>
   );
 };
 
