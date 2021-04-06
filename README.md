@@ -57,6 +57,21 @@ The benefits of TypeScript are very significant, even in a small project like th
 - Since we don't have a UI designer, we'd benefit from a React Native component library that provides UI components that look good out-of-the-box.
 - There's a [few choices](https://blog.logrocket.com/react-native-component-libraries-in-2020/), but I settled on [React Native Paper](https://callstack.github.io/react-native-paper/index.html)
 
+### Testing Strategy
+
+- React Native docs have a [good overview on testing](https://reactnative.dev/docs/testing-overview)
+  - Taking inspiration from the [testing pyramid](https://www.codecademy.com/articles/tdd-testing-pyramid), I aim to have high coverage on the unit test level
+  - As of now, no plans to implement Integration or End-to-End tests
+  - Avoiding Snapshot tests as it can be hard to tell whether a change in snapshot is intended or whether it's evidence of a bug, which reduces their value (more weaknesses of Snapshot testing highlighted [here](https://reactnative.dev/docs/testing-overview#testing-rendered-output))
+- `create-react-native-app` comes with the Jest testing framework
+- To assist with writing unit/component tests that resemble the way the app is used by end users, I'm using [`@testing-library/react-native`](https://github.com/callstack/react-native-testing-library)
+  - Testing Library has [high satisfaction scores](https://2020.stateofjs.com/en-US/technologies/testing/)
+
+### Continous Delivery
+
+- iOS builds can be distributed via [Visual Studio App Center](https://appcenter.ms/)
+- Builds can be automated, and releases can distributed by configuring these tasks to run upon a new commit pushed to a particular git branch
+
 ## Setup Instructions
 
 ### Build & Run
